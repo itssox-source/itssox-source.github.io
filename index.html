@@ -1,19 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>ITSSOX TEST</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sox Vouch Hub | itssox.xyz</title>
     <style>
-        body { background: #000; color: #0ff; font-family: monospace; display: flex; 
-               justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { border: 2px solid #0ff; padding: 40px; text-align: center; box-shadow: 5px 5px 0px #f0f; }
-        h1 { font-size: 3rem; text-shadow: 2px 2px #000; }
+        /* RETRO / VAPORWAVE STYLE */
+        body {
+            background-color: #0d0221;
+            color: #00f2ff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            border: 3px solid #ff007f;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 10px 10px 0px #7000ff;
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 3px 3px #ff007f;
+            margin-bottom: 10px;
+        }
+
+        .vouch-list {
+            margin-top: 40px;
+            display: grid;
+            gap: 20px;
+            text-align: left;
+        }
+
+        .vouch-card {
+            border: 1px solid #00f2ff;
+            padding: 15px;
+            background: rgba(0, 242, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .vouch-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .vouch-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #ff007f;
+        }
+
+        .vouch-name { font-weight: bold; color: #ff007f; }
+        .vouch-stars { color: #f9d71c; }
     </style>
 </head>
 <body>
-    <div class="box">
+
+    <div class="container">
         <h1>ITSSOX.XYZ</h1>
-        <p>CONNECTION SUCCESSFUL</p>
-        <p style="color: #f0f;">The server is talking to your browser.</p>
+        <p>The Official Vouch Hub</p>
+        <hr style="border: 1px solid #ff007f;">
+
+        <div id="vouches" class="vouch-list">
+            <p style="text-align: center;">Loading latest vouches...</p>
+        </div>
     </div>
+
+    <script>
+        // REPLACE THIS URL with your Railway App URL once the Bot is hosted
+        const API_URL = 'https://your-bot-app.up.railway.app/api/vouches';
+
+        async function loadVouches() {
+            const container = document.getElementById('vouches');
+            try {
+                const response = await fetch(API_URL);
+                const vouches = await response.json();
+
+                if (vouches.length === 0) {
+                    container.innerHTML = "<p style='text-align:center;'>No vouches yet. Be the first!</p>";
+                    return;
+                }
+
+                container.innerHTML = vouches.map(v => `
+                    <div class="vouch-card">
+                        <div class="vouch-header">
+                            <img class="vouch-avatar" src="${v.Avatar || 'https://via.placeholder.com/50'}" alt="User">
+                            <div>
+                                <div class="vouch-name">${v.Name}</div>
+                                <div class="vouch-stars">${'⭐'.repeat(v.Stars)}</div>
+                            </div>
+                        </div>
+                        <div class="vouch-desc">"${v.Description}"</div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = "<p style='color: #ff4444;'>Error loading vouches. Bot might be offline.</p>";
+            }
+        }
+
+        loadVouches();
+    </script>
 </body>
 </html>
