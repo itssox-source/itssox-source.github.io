@@ -4,115 +4,591 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sox Vouch Hub | itssox.xyz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        /* RETRO / VAPORWAVE STYLE */
+        :root {
+            --cyan: #00f2ff;
+            --pink: #ff007f;
+            --purple: #7000ff;
+            --dark-purple: #1a003a;
+            --bg: #0d0221;
+            --gold: #f9d71c;
+            --grid-color: rgba(112, 0, 255, 0.15);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            background-color: #0d0221;
-            color: #00f2ff;
-            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg);
+            color: var(--cyan);
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── GRID BACKGROUND ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── SCANLINES ── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── SUN ── */
+        .sun {
+            position: fixed;
+            bottom: -120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: linear-gradient(to top, #ff007f, #ff6b35, #f9d71c);
+            box-shadow: 0 0 80px 20px rgba(255, 0, 127, 0.4);
+            z-index: 0;
+            overflow: hidden;
+        }
+        .sun::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                transparent,
+                transparent 18px,
+                var(--bg) 18px,
+                var(--bg) 22px
+            );
+        }
+
+        /* ── PAGE WRAPPER ── */
+        .page {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 40px 20px 120px;
             min-height: 100vh;
-            margin: 0;
-            padding: 20px;
         }
 
-        .container {
-            border: 3px solid #ff007f;
-            background: rgba(0, 0, 0, 0.8);
-            box-shadow: 10px 10px 0px #7000ff;
-            max-width: 800px;
+        /* ── HEADER ── */
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+            animation: fadeDown 0.8s ease both;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            text-shadow:
+                0 0 10px var(--cyan),
+                0 0 30px var(--cyan),
+                4px 4px 0 var(--pink),
+                8px 8px 0 var(--purple);
+            line-height: 1.1;
+        }
+
+        .logo span {
+            color: var(--pink);
+            text-shadow:
+                0 0 10px var(--pink),
+                0 0 30px var(--pink),
+                4px 4px 0 var(--purple);
+        }
+
+        .tagline {
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            color: var(--pink);
+            text-transform: uppercase;
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+
+        /* ── DIVIDER ── */
+        .divider {
             width: 100%;
-            padding: 30px;
+            max-width: 760px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--pink), var(--cyan), var(--purple), transparent);
+            margin: 24px 0;
+            animation: fadeIn 1s ease 0.3s both;
+        }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 36px;
+            animation: fadeIn 1s ease 0.5s both;
+        }
+        .stat {
             text-align: center;
         }
-
-        h1 {
-            font-size: 3rem;
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--pink);
+            text-shadow: 0 0 10px var(--pink);
+        }
+        .stat-label {
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            color: var(--cyan);
+            opacity: 0.7;
             text-transform: uppercase;
-            letter-spacing: 5px;
-            text-shadow: 3px 3px #ff007f;
-            margin-bottom: 10px;
         }
 
-        .vouch-list {
-            margin-top: 40px;
+        /* ── FILTER BAR ── */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 36px;
+            animation: fadeIn 1s ease 0.6s both;
+        }
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 6px 18px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--cyan);
+            color: var(--bg);
+            box-shadow: 0 0 12px var(--cyan);
+        }
+        .filter-btn.active {
+            border-color: var(--cyan);
+        }
+
+        /* ── VOUCH GRID ── */
+        .vouch-grid {
             display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 20px;
-            text-align: left;
+            width: 100%;
+            max-width: 760px;
         }
 
+        /* ── VOUCH CARD ── */
         .vouch-card {
-            border: 1px solid #00f2ff;
-            padding: 15px;
-            background: rgba(0, 242, 255, 0.05);
-            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.65);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            animation: fadeUp 0.5s ease both;
+        }
+        .vouch-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--purple), var(--pink), var(--cyan));
+        }
+        .vouch-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--cyan);
+            box-shadow: 0 8px 30px rgba(0, 242, 255, 0.15), 0 0 0 1px rgba(0, 242, 255, 0.1);
+        }
+
+        /* corner accent */
+        .vouch-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 20px; height: 20px;
+            border-bottom: 2px solid var(--pink);
+            border-right: 2px solid var(--pink);
         }
 
         .vouch-header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 14px;
+            margin-bottom: 14px;
         }
 
         .vouch-avatar {
-            width: 50px;
-            height: 50px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
-            border: 2px solid #ff007f;
+            border: 2px solid var(--pink);
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+            object-fit: cover;
+            flex-shrink: 0;
         }
 
-        .vouch-name { font-weight: bold; color: #ff007f; }
-        .vouch-stars { color: #f9d71c; }
+        .vouch-meta { flex: 1; min-width: 0; }
+
+        .vouch-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--pink);
+            text-shadow: 0 0 8px rgba(255, 0, 127, 0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .vouch-stars {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            margin-top: 3px;
+        }
+
+        .vouch-desc {
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: rgba(0, 242, 255, 0.8);
+            border-left: 2px solid rgba(255, 0, 127, 0.4);
+            padding-left: 12px;
+        }
+
+        .vouch-tag {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--purple);
+            border: 1px solid var(--purple);
+            padding: 2px 8px;
+        }
+
+        /* ── EMPTY / ERROR STATE ── */
+        .state-msg {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px 20px;
+            opacity: 0.7;
+        }
+        .state-msg .icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .state-msg p { letter-spacing: 2px; font-size: 0.85rem; }
+
+        /* ── LOADING SKELETONS ── */
+        .skeleton-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            padding: 20px;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        .skel-line {
+            background: rgba(0, 242, 255, 0.08);
+            border-radius: 2px;
+            height: 12px;
+            margin-bottom: 10px;
+        }
+        .skel-line.short { width: 40%; }
+        .skel-line.med   { width: 60%; }
+        .skel-line.full  { width: 100%; }
+        .skel-avatar {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: rgba(255, 0, 127, 0.1);
+            flex-shrink: 0;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            opacity: 0.4;
+            text-transform: uppercase;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
+        }
+        @keyframes glitch {
+            0%   { clip-path: inset(0 0 95% 0); transform: translate(-4px, 0); }
+            20%  { clip-path: inset(30% 0 50% 0); transform: translate(4px, 0); }
+            40%  { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 0); }
+            60%  { clip-path: inset(80% 0 5% 0); transform: translate(2px, 0); }
+            80%  { clip-path: inset(10% 0 75% 0); transform: translate(-3px, 0); }
+            100% { clip-path: inset(0 0 95% 0); transform: translate(0, 0); }
+        }
+
+        /* glitch overlay on logo hover */
+        .logo-wrap { position: relative; display: inline-block; }
+        .logo-wrap::before, .logo-wrap::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: inherit;
+            font-weight: 900;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            width: 100%;
+            pointer-events: none;
+            opacity: 0;
+        }
+        .logo-wrap::before { color: var(--pink); text-shadow: none; }
+        .logo-wrap::after  { color: var(--cyan); text-shadow: none; }
+        .logo-wrap:hover::before { animation: glitch 0.3s steps(1) infinite; opacity: 0.8; }
+        .logo-wrap:hover::after  { animation: glitch 0.3s steps(1) 0.1s infinite; opacity: 0.6; }
+
+        /* ── CONFIG NOTE ── */
+        .config-note {
+            background: rgba(240, 157, 0, 0.08);
+            border: 1px solid rgba(249, 215, 28, 0.4);
+            color: var(--gold);
+            font-size: 0.72rem;
+            letter-spacing: 1px;
+            padding: 10px 16px;
+            max-width: 760px;
+            width: 100%;
+            margin-bottom: 24px;
+            text-align: center;
+            display: none;
+        }
+        .config-note.visible { display: block; }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .vouch-grid { grid-template-columns: 1fr; }
+            .stats-bar  { gap: 20px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>ITSSOX.XYZ</h1>
-        <p>The Official Vouch Hub</p>
-        <hr style="border: 1px solid #ff007f;">
+<div class="sun"></div>
 
-        <div id="vouches" class="vouch-list">
-            <p style="text-align: center;">Loading latest vouches...</p>
+<div class="page">
+
+    <header>
+        <div class="logo-wrap" data-text="ITSSOX.XYZ">
+            <div class="logo">ITS<span>SOX</span>.XYZ</div>
+        </div>
+        <div class="tagline">⬡ The Official Vouch Hub ⬡</div>
+    </header>
+
+    <div class="divider"></div>
+
+    <div class="stats-bar" id="statsBar">
+        <div class="stat">
+            <div class="stat-value" id="statTotal">—</div>
+            <div class="stat-label">Total Vouches</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="statAvg">—</div>
+            <div class="stat-label">Avg Rating</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="statFive">—</div>
+            <div class="stat-label">5-Star Reviews</div>
         </div>
     </div>
 
-    <script>
-        // REPLACE THIS URL with your Railway App URL once the Bot is hosted
-        const API_URL = 'https://your-bot-app.up.railway.app/api/vouches';
+    <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="5">5 ⭐</button>
+        <button class="filter-btn" data-filter="4">4 ⭐</button>
+        <button class="filter-btn" data-filter="3">3 ⭐</button>
+    </div>
 
-        async function loadVouches() {
-            const container = document.getElementById('vouches');
-            try {
-                const response = await fetch(API_URL);
-                const vouches = await response.json();
+    <div class="config-note" id="configNote">
+        ⚠ API_URL not configured — showing demo data. Replace the API_URL constant in the script to connect your bot.
+    </div>
 
-                if (vouches.length === 0) {
-                    container.innerHTML = "<p style='text-align:center;'>No vouches yet. Be the first!</p>";
-                    return;
-                }
+    <div class="vouch-grid" id="vouches">
+        <!-- skeletons -->
+        <div class="skeleton-card">
+            <div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;">
+                <div class="skel-avatar"></div>
+                <div style="flex:1"><div class="skel-line short"></div><div class="skel-line med"></div></div>
+            </div>
+            <div class="skel-line full"></div><div class="skel-line full"></div><div class="skel-line med"></div>
+        </div>
+        <div class="skeleton-card">
+            <div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;">
+                <div class="skel-avatar"></div>
+                <div style="flex:1"><div class="skel-line short"></div><div class="skel-line med"></div></div>
+            </div>
+            <div class="skel-line full"></div><div class="skel-line full"></div><div class="skel-line med"></div>
+        </div>
+        <div class="skeleton-card">
+            <div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;">
+                <div class="skel-avatar"></div>
+                <div style="flex:1"><div class="skel-line short"></div><div class="skel-line med"></div></div>
+            </div>
+            <div class="skel-line full"></div><div class="skel-line full"></div><div class="skel-line med"></div>
+        </div>
+    </div>
 
-                container.innerHTML = vouches.map(v => `
-                    <div class="vouch-card">
-                        <div class="vouch-header">
-                            <img class="vouch-avatar" src="${v.Avatar || 'https://via.placeholder.com/50'}" alt="User">
-                            <div>
-                                <div class="vouch-name">${v.Name}</div>
-                                <div class="vouch-stars">${'⭐'.repeat(v.Stars)}</div>
-                            </div>
-                        </div>
-                        <div class="vouch-desc">"${v.Description}"</div>
+    <footer>
+        &copy; 2025 itssox.xyz &nbsp;·&nbsp; All rights reserved
+    </footer>
+</div>
+
+<script>
+    // ── CONFIG ────────────────────────────────────────────────────────────────
+    const API_URL = 'https://your-bot-app.up.railway.app/api/vouches';
+
+    // ── DEMO DATA (shown when API is not configured) ─────────────────────────
+    const DEMO_VOUCHES = [
+        { Name: 'xNovaStar',   Avatar: 'https://i.pravatar.cc/50?img=1',  Stars: 5, Description: 'Sox went above and beyond, super fast delivery and exactly what I ordered. No issues at all, legit 10/10 seller.', Tag: 'Verified' },
+        { Name: 'LunaVex',     Avatar: 'https://i.pravatar.cc/50?img=5',  Stars: 5, Description: 'Smooth transaction, responsive and professional. Will definitely be coming back. Highly recommend to anyone.', Tag: 'Repeat Customer' },
+        { Name: 'HyperDrift',  Avatar: 'https://i.pravatar.cc/50?img=8',  Stars: 4, Description: 'Good experience overall. Minor delay but Sox kept me updated the whole time. Quality product, fair price.', Tag: 'Verified' },
+        { Name: 'Zypheria',    Avatar: 'https://i.pravatar.cc/50?img=12', Stars: 5, Description: 'Insane service. Never dealt with someone this efficient before. Already referred three friends. Pure trust.', Tag: 'Top Buyer' },
+        { Name: 'NeonBreach',  Avatar: 'https://i.pravatar.cc/50?img=15', Stars: 5, Description: 'Fast, safe, and legit. Sox is the real deal. Nothing sketchy ever, full transparency throughout.', Tag: 'Verified' },
+        { Name: 'VoidPulsar',  Avatar: 'https://i.pravatar.cc/50?img=20', Stars: 4, Description: 'Solid seller with good communication. Product was as described. Would definitely use again.', Tag: 'Verified' },
+    ];
+
+    // ── STATE ─────────────────────────────────────────────────────────────────
+    let allVouches = [];
+    let activeFilter = 'all';
+
+    // ── RENDER HELPERS ────────────────────────────────────────────────────────
+    function starEmoji(n) {
+        return '⭐'.repeat(Math.max(0, Math.min(5, n)));
+    }
+
+    function renderCard(v, delay) {
+        return `
+            <div class="vouch-card" style="animation-delay:${delay}ms">
+                <div class="vouch-header">
+                    <img class="vouch-avatar" src="${v.Avatar || 'https://i.pravatar.cc/50'}" alt="${v.Name}" onerror="this.src='https://i.pravatar.cc/50'">
+                    <div class="vouch-meta">
+                        <div class="vouch-name">${escHtml(v.Name)}</div>
+                        <div class="vouch-stars">${starEmoji(v.Stars)}</div>
                     </div>
-                `).join('');
-            } catch (err) {
-                container.innerHTML = "<p style='color: #ff4444;'>Error loading vouches. Bot might be offline.</p>";
-            }
+                </div>
+                <div class="vouch-desc">"${escHtml(v.Description)}"</div>
+                ${v.Tag ? `<span class="vouch-tag">${escHtml(v.Tag)}</span>` : ''}
+            </div>`;
+    }
+
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderVouches(vouches) {
+        const container = document.getElementById('vouches');
+        if (!vouches.length) {
+            container.innerHTML = `
+                <div class="state-msg">
+                    <div class="icon">◈</div>
+                    <p>No vouches match this filter.</p>
+                </div>`;
+            return;
+        }
+        container.innerHTML = vouches.map((v, i) => renderCard(v, i * 80)).join('');
+    }
+
+    function applyFilter() {
+        const filtered = activeFilter === 'all'
+            ? allVouches
+            : allVouches.filter(v => v.Stars === parseInt(activeFilter));
+        renderVouches(filtered);
+    }
+
+    function updateStats(vouches) {
+        const total = vouches.length;
+        const avg   = total ? (vouches.reduce((s, v) => s + v.Stars, 0) / total).toFixed(1) : '—';
+        const five  = vouches.filter(v => v.Stars === 5).length;
+        document.getElementById('statTotal').textContent = total || '—';
+        document.getElementById('statAvg').textContent   = total ? avg : '—';
+        document.getElementById('statFive').textContent  = total ? five : '—';
+    }
+
+    // ── FILTER BUTTONS ────────────────────────────────────────────────────────
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter;
+            applyFilter();
+        });
+    });
+
+    // ── LOAD DATA ─────────────────────────────────────────────────────────────
+    async function loadVouches() {
+        const isDemo = API_URL.includes('your-bot-app');
+
+        if (isDemo) {
+            document.getElementById('configNote').classList.add('visible');
+            allVouches = DEMO_VOUCHES;
+            updateStats(allVouches);
+            applyFilter();
+            return;
         }
 
-        loadVouches();
-    </script>
+        try {
+            const res     = await fetch(API_URL);
+            const vouches = await res.json();
+            allVouches = vouches;
+            updateStats(allVouches);
+            applyFilter();
+        } catch (err) {
+            document.getElementById('vouches').innerHTML = `
+                <div class="state-msg">
+                    <div class="icon">⚠</div>
+                    <p style="color:#ff4444">Error loading vouches. Bot might be offline.</p>
+                </div>`;
+        }
+    }
+
+    loadVouches();
+</script>
 </body>
 </html>
